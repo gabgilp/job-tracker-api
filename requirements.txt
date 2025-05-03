@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+databases[postgresql]
+python-dotenv
+pydantic-settings
