@@ -33,6 +33,8 @@ class UserTable(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
 
+    applications = relationship("ApplicationTable", back_populates="user")
+
 class ApplicationTable(Base):
     __tablename__ = "applications"
 

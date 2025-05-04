@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from tracker.routers.application import router as application_router
+from tracker.routers.authentication import router as authentication_router
 import tracker.database as db
 from contextlib import asynccontextmanager
 import subprocess
@@ -14,7 +15,7 @@ async def lifespan(app: FastAPI):
 
         await db.init_db()
         print("Database initialized")
-        
+
         yield
     finally:
         await db.database.disconnect()
@@ -28,5 +29,6 @@ async def lifespan(app: FastAPI):
                 print(f"Error stopping PostgreSQL: {e}")
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(application_router, prefix="/api")
+app.include_router(application_router, prefix="/api/applications")
+app.include_router(authentication_router, prefix="/api/auth")
 

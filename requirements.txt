@@ -6,3 +6,5 @@ python-dotenv
 pydantic-settings
 asyncpg
 psycopg2
+passlib[bcrypt]
+pydantic[email]
