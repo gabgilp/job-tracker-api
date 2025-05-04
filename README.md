@@ -60,12 +60,7 @@ To allow FastAPI to stop PostgreSQL automatically when shutting down:
   which systemctl
   ```
 
-> ⚠️ **Warning:** If you're using PostgreSQL for other services, it's recommended to remove or comment out this line in `tracker/main.py`:
->
-> ```python
-> subprocess.run(["sudo", "systemctl", "stop", "postgresql"])
-> ```
-> Otherwise, shutting down the API will stop PostgreSQL globally.
+> 💡 If you do not want to automatically stop PostgreSQL on shutdown, set the `SHUTDOWN_POSTGRES` environmnet variable to 0.
 
 ---
 
