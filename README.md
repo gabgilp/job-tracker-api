@@ -86,7 +86,7 @@ This will:
 
 ## 📝 Notes
 
-- Database settings are stored in `.env`. Ensure this file is properly configured and not committed to version control.
+- Database settings are stored in `.env`. Ensure this file is properly configured and not committed to version control. A .env.example file is provided.
 - `.venv`, `.env`, and other sensitive files should be listed in `.gitignore`.
 
 ---
