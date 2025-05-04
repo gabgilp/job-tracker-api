@@ -102,7 +102,7 @@ job-tracker-api/
 ├── README.md
 └── tracker/
     ├── main.py
-    ├── db.py
+    ├── database.py
     ├── models/
     ├── routers/
     └── ...
