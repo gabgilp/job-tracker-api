@@ -13,7 +13,6 @@ async def lifespan(app: FastAPI):
     await database.disconnect()
     print("Disconnected from the database")
     subprocess.run(["sudo", "systemctl", "stop", "postgresql"])
-    print("PostgreSQL service stopped")
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(application_router, prefix="/api")
