@@ -4,3 +4,5 @@ sqlalchemy
 databases[postgresql]
 python-dotenv
 pydantic-settings
+asyncpg
+psycopg2

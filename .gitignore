@@ -2,7 +2,6 @@
 .DS_Store
 *.pyc
 __pycache__
-*.db
 .vscode/
 *.png
 .pytest_cache/
