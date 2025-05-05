@@ -7,6 +7,7 @@ from sqlalchemy import text
 from tracker.database import UserTable
 
 
+
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 router = APIRouter()
@@ -46,6 +47,7 @@ async def register_user(user: UserIn, db: AsyncSession = Depends(get_db)):
 
 
     return {
+        "message": "User registered successfully",
         "access_token": token["access_token"],
         "token_type": token["token_type"],
         "user": {
@@ -67,13 +69,13 @@ async def login_user(user: UserLogin, db: AsyncSession = Depends(get_db)):
 
     # Check if the user exists and verify the password
     if not db_user:
-        raise HTTPException(status_code=401, detail="Invalid username or password")
+        raise HTTPException(status_code=401, detail="Invalid username")
 
     # Convert the row to a dictionary
     user_dict = dict(db_user._mapping)  # Use _mapping to access row as a dictionary
 
     if not verify_password(user.password, user_dict["hashed_password"]):
-        raise HTTPException(status_code=401, detail="Invalid username or password")
+        raise HTTPException(status_code=401, detail="Invalid password")
 
     # Generate the access token
     token: str = generate_jwt_for_user(user.username)

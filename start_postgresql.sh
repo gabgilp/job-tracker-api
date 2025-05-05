@@ -1,7 +1,14 @@
 #!/bin/bash
 
-# Load the .env file and export the variables
-export $(cat .env | xargs)
+if [ "$ENV_STATE" == "test" ]; then
+    echo "ENV_STATE is already set to 'test'. Loading .env and overriding ENV_STATE to 'test'."
+    export $(cat .env | xargs)
+    ENV_STATE="test"  # Explicitly set ENV_STATE to "test"
+elif [ -z "$ENV_STATE" ]; then
+    echo "ENV_STATE is not set. Loading .env as is."
+    export $(cat .env | xargs)
+fi
+
 
 # Determine which database name to use based on ENV_STATE
 if [ "$ENV_STATE" == "dev" ]; then

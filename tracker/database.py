@@ -5,11 +5,9 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
-
-
 DB_URL = config.DB_URL
 
-database = Database(DB_URL, force_rollback=config.FORCE_ROLL_BACK)
+database = Database(DB_URL)
 
 engine = create_async_engine(DB_URL)
 
