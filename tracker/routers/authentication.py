@@ -21,11 +21,11 @@ async def get_db():
 async def register_user(user: UserIn, db: AsyncSession = Depends(get_db)):
     # Check if the username or email already exists
     existing_user = await db.execute(
-        text("SELECT * FROM users WHERE username = :username OR email = :email"),
-        {"username": user.username, "email": user.email}
+        text("SELECT * FROM users WHERE username = :username"),
+        {"username": user.username}
     )
     if existing_user.first():
-        raise HTTPException(status_code=400, detail="Username or email already registered")
+        raise HTTPException(status_code=400, detail="Username already registered")
 
     # Hash the password
     hashed_password = get_password_hash(user.password)
@@ -33,7 +33,6 @@ async def register_user(user: UserIn, db: AsyncSession = Depends(get_db)):
     # Create a new user instance using the ORM model
     new_user = UserTable(
         username=user.username,
-        email=user.email,
         hashed_password=hashed_password,
         first_name=user.first_name,
         last_name=user.last_name
