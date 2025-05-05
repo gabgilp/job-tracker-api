@@ -13,8 +13,8 @@ os.environ["ENV_STATE"] = "test"
 # Start PostgreSQL before the test session
 subprocess.run(["bash", "start_postgresql.sh"], check=True)
 
-from tracker.main import app
-import tracker.database as db
+from tracker.main import app  # noqa: E402
+import tracker.database as db  # noqa: E402
 
 @pytest.fixture(scope="session")
 def anyio_backend():
