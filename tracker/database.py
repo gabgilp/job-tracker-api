@@ -1,14 +1,11 @@
 from databases import Database
-import os
-from dotenv import load_dotenv
+from tracker.config import config
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
-
-DB_URL = os.getenv("DB_URL")
+DB_URL = config.DB_URL
 
 database = Database(DB_URL)
 
