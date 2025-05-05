@@ -8,6 +8,7 @@ class ApplicationIn(BaseModel):
     status: str
     notes: str
     date_applied: str
+    posting_url: str
 
 class Application(ApplicationIn):
     model_config = ConfigDict(from_attributes=True)

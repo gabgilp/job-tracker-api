@@ -43,6 +43,7 @@ class ApplicationTable(Base):
     status = Column(String, index=True, nullable=False)
     notes = Column(Text)
     date_applied = Column(String, index=True, nullable=False)
+    posting_url = Column(Text, index=True)
 
     user = relationship("UserTable", back_populates="applications")
 
