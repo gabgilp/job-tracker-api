@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../..", ".env"))
 SECRET_KEY = os.getenv("SECRET_KEY")  
 ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 def get_password_hash(password: str) -> str:
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -23,4 +24,11 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+def generate_jwt_for_user(username: str):
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
 

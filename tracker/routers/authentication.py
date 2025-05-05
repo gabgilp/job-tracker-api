@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
-from tracker.auth.utils import get_password_hash, verify_password, create_access_token
+from tracker.auth.utils import get_password_hash, verify_password, generate_jwt_for_user
 from tracker.models.user import UserIn, UserLogin
 from tracker.database import async_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
-from tracker.database import UserTable  # Import the User table model
-from datetime import timedelta
+from tracker.database import UserTable
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
@@ -43,7 +42,19 @@ async def register_user(user: UserIn, db: AsyncSession = Depends(get_db)):
     await db.commit()
     await db.refresh(new_user)
 
-    return {"message": "User registered successfully"}
+    token: str = generate_jwt_for_user(user.username)
+
+
+    return {
+        "access_token": token["access_token"],
+        "token_type": token["token_type"],
+        "user": {
+            "id": new_user.id,
+            "username": new_user.username,
+            "first_name": new_user.first_name,
+            "last_name": new_user.last_name
+        }
+    }
 
 @router.post("/login")
 async def login_user(user: UserLogin, db: AsyncSession = Depends(get_db)):
@@ -65,9 +76,15 @@ async def login_user(user: UserLogin, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
     # Generate the access token
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user_dict["username"]}, expires_delta=access_token_expires
-    )
+    token: str = generate_jwt_for_user(user.username)
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": token["access_token"],
+        "token_type": token["token_type"],
+        "user": {
+            "id": user_dict["id"],
+            "username": user_dict["username"],
+            "first_name": user_dict["first_name"],
+            "last_name": user_dict["last_name"]
+        }
+    }
