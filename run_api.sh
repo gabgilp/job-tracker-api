@@ -4,4 +4,4 @@
 ./start_postgresql.sh
 
 # Run FastAPI using Uvicorn
-uvicorn tracker.main:app --reload
+uvicorn tracker.main:app

@@ -20,3 +20,7 @@ class UserInDB(User):
     model_config = ConfigDict(from_attributes=True)
     hashed_password: str
     
+
+class UserLogin(BaseModel):
+    username: str
+    password: str

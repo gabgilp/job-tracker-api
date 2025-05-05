@@ -8,3 +8,5 @@ asyncpg
 psycopg2
 passlib[bcrypt]
 pydantic[email]
+python-jose[cryptography]
+bcrypt==3.2.2
