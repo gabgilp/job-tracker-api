@@ -1,9 +1,13 @@
 import os
 from dotenv import load_dotenv
 
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"), override=False)
+
 class Config:
     ENV_STATE: str
     DB_URL: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+    SECRET_KEY: str = os.getenv("SECRET_KEY") 
 
 class TestConfig(Config):
     ENV_STATE = "test"
@@ -22,5 +26,4 @@ def get_config(env_state: str) -> Config:
         raise ValueError(f"Invalid environment state: {env_state}")
     return configs[env_state]()
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"), override=False)
 config = get_config(os.getenv("ENV_STATE", "dev"))

@@ -1,21 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from tracker.auth.utils import get_password_hash, verify_password, generate_jwt_for_user
 from tracker.models.user import UserIn, UserLogin
-from tracker.database import async_session
+from tracker.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from tracker.database import UserTable
 
-
-
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
-
 router = APIRouter()
-
-
-async def get_db():
-    async with async_session() as session:
-        yield session
 
 @router.post("/register", status_code=201)
 async def register_user(user: UserIn, db: AsyncSession = Depends(get_db)):
