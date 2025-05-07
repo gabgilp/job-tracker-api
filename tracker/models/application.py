@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict
+from datetime import datetime
 
 
 class ApplicationIn(BaseModel):
@@ -7,7 +8,7 @@ class ApplicationIn(BaseModel):
     position_title: str
     status: str
     notes: str
-    date_applied: str
+    date_applied: datetime
     posting_url: str
 
 class Application(ApplicationIn):

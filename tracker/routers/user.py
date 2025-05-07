@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Header
 from tracker.auth.utils import verify_and_refresh_jwt
 from tracker.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,8 +9,9 @@ from tracker.routers.utils import get_token, get_user_from_db
 router = APIRouter()
 
 @router.get("/", response_model=UserResponse)
-async def get_user_data(request: Request, db: AsyncSession = Depends(get_db)):
-    token = get_token(request)
+async def get_user_data(Authorization: str = Header(..., description="Bearer token for authentication"), 
+                        db: AsyncSession = Depends(get_db)):
+    token = get_token(Authorization)
 
     try:
         decoded_token = verify_and_refresh_jwt(token)
