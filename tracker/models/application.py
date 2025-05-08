@@ -14,3 +14,5 @@ class ApplicationIn(BaseModel):
 class Application(ApplicationIn):
     model_config = ConfigDict(from_attributes=True)
     id: int
+    rejection_reason: str | None = None
+    rejection_date: datetime | None = None

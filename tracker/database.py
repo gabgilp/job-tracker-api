@@ -41,6 +41,8 @@ class ApplicationTable(Base):
     notes = Column(Text)
     date_applied = Column(Date, index=True, nullable=False)
     posting_url = Column(Text, index=True)
+    rejection_reason = Column(Text, nullable=True)
+    rejection_date = Column(Date, nullable=True)
 
     user = relationship("UserTable", back_populates="applications")
 

@@ -35,7 +35,9 @@ async def create_application(application: ApplicationIn,
         status=application.status,
         notes=application.notes,
         date_applied=application.date_applied,
-        posting_url=application.posting_url
+        posting_url=application.posting_url,
+        rejection_reason=None,
+        rejection_date=None
     )
 
     db.add(new_application)
