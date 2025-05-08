@@ -16,3 +16,8 @@ class Application(ApplicationIn):
     id: int
     rejection_reason: str | None = None
     rejection_date: datetime | None = None
+
+class ApplicationResponse(BaseModel):
+    new_token: str
+    token_type: str
+    application: Application

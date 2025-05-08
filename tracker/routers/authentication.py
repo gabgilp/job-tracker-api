@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from tracker.auth.utils import get_password_hash, verify_password, generate_jwt_for_user
-from tracker.models.user import UserIn, UserLogin
+from tracker.models.user import UserIn, UserLogin, UserResponse
 from tracker.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
@@ -8,7 +8,7 @@ from tracker.database import UserTable
 
 router = APIRouter()
 
-@router.post("/register/", status_code=201)
+@router.post("/register/", response_model=UserResponse)
 async def register_user(user: UserIn, db: AsyncSession = Depends(get_db)):
     # Check if the username or email already exists
     existing_user = await db.execute(
@@ -38,8 +38,7 @@ async def register_user(user: UserIn, db: AsyncSession = Depends(get_db)):
 
 
     return {
-        "message": "User registered successfully",
-        "access_token": token["access_token"],
+        "new_token": token["access_token"],
         "token_type": token["token_type"],
         "user": {
             "id": new_user.id,
@@ -49,7 +48,7 @@ async def register_user(user: UserIn, db: AsyncSession = Depends(get_db)):
         }
     }
 
-@router.post("/login/")
+@router.post("/login/", response_model=UserResponse)
 async def login_user(user: UserLogin, db: AsyncSession = Depends(get_db)):
     # Fetch the user from the database
     result = await db.execute(
@@ -72,7 +71,7 @@ async def login_user(user: UserLogin, db: AsyncSession = Depends(get_db)):
     token: str = generate_jwt_for_user(user.username)
 
     return {
-        "access_token": token["access_token"],
+        "new_token": token["access_token"],
         "token_type": token["token_type"],
         "user": {
             "id": user_dict["id"],

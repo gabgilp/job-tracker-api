@@ -28,11 +28,14 @@ async def get_user_data(Authorization: str = Header(..., description="Bearer tok
                             detail="User not found")
     
     return {
-        "username": user.username,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "id": user.id,
-        "new_token": decoded_token["new_token"]
+        "user" : {
+            "username": user.username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "id": user.id
+        },
+        "new_token": decoded_token["new_token"],
+        "token_type": "bearer"
     }
 
 

@@ -4,11 +4,11 @@ from tracker.database import get_db, ApplicationTable
 from tracker.routers.utils import get_token, verify_user_id
 from tracker.auth.utils import verify_and_refresh_jwt
 from jose import JWTError
-from tracker.models.application import ApplicationIn
+from tracker.models.application import ApplicationIn, ApplicationResponse
 
 router = APIRouter()
 
-@router.post("/")
+@router.post("/", response_model=ApplicationResponse)
 async def create_application(application: ApplicationIn,
                              Authorization: str = Header(..., description="Bearer token for authentication"),
                              db: AsyncSession = Depends(get_db)):
@@ -24,9 +24,6 @@ async def create_application(application: ApplicationIn,
     username = decoded_token["username"]
 
     await verify_user_id(db, application.user_id, username)
-    
-
-    print(f"Creating application for user {username}")
 
     new_application = ApplicationTable(
         user_id=application.user_id,
@@ -45,9 +42,9 @@ async def create_application(application: ApplicationIn,
     await db.refresh(new_application)
 
     return {
-        "message": "Application created successfully",
         "application": new_application,
-        "new_token": decoded_token["new_token"]
+        "new_token": decoded_token["new_token"],
+        "token_type": "bearer"
     }
 
 

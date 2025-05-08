@@ -8,14 +8,16 @@ class UserIn(BaseModel):
     last_name: str
 
 class User(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
     id: int
     username: str
     first_name: str
     last_name: str
 
-class UserResponse(User):
+class UserResponse(BaseModel):
     new_token: str
+    token_type: str
+    user: User
+
 
 class UserInDB(User):
     model_config = ConfigDict(from_attributes=True)
