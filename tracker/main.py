@@ -30,7 +30,7 @@ async def lifespan(app: FastAPI):
                 print(f"Error stopping PostgreSQL: {e}")
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(application_router, prefix="/api/applications")
+app.include_router(application_router, prefix="/api/application")
 app.include_router(authentication_router, prefix="/api/auth")
 app.include_router(user_router, prefix="/api/user")
 

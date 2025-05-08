@@ -2,7 +2,7 @@ from databases import Database
 from tracker.config import config
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Date
 from sqlalchemy.orm import relationship
 
 DB_URL = config.DB_URL
@@ -39,7 +39,7 @@ class ApplicationTable(Base):
     position_title = Column(String, index=True, nullable=False)
     status = Column(String, index=True, nullable=False)
     notes = Column(Text)
-    date_applied = Column(String, index=True, nullable=False)
+    date_applied = Column(Date, index=True, nullable=False)
     posting_url = Column(Text, index=True)
 
     user = relationship("UserTable", back_populates="applications")

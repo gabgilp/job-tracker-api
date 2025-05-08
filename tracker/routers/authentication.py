@@ -8,7 +8,7 @@ from tracker.database import UserTable
 
 router = APIRouter()
 
-@router.post("/register", status_code=201)
+@router.post("/register/", status_code=201)
 async def register_user(user: UserIn, db: AsyncSession = Depends(get_db)):
     # Check if the username or email already exists
     existing_user = await db.execute(
@@ -49,7 +49,7 @@ async def register_user(user: UserIn, db: AsyncSession = Depends(get_db)):
         }
     }
 
-@router.post("/login")
+@router.post("/login/")
 async def login_user(user: UserLogin, db: AsyncSession = Depends(get_db)):
     # Fetch the user from the database
     result = await db.execute(
