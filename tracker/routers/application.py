@@ -44,7 +44,8 @@ async def create_application(application: ApplicationIn,
 
     return {
         "message": "Application created successfully",
-        "application": new_application
+        "application": new_application,
+        "new_token": decoded_token["new_token"]
     }
 
 
