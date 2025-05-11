@@ -11,11 +11,13 @@ class ApplicationIn(BaseModel):
     date_applied: datetime
     posting_url: str
 
-class Application(ApplicationIn):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
+class ApplicationToModify(ApplicationIn):
     rejection_reason: str | None = None
     rejection_date: datetime | None = None
+
+class Application(ApplicationToModify):
+    id: int
+    model_config = ConfigDict(from_attributes=True)
 
 class ApplicationResponse(BaseModel):
     new_token: str
