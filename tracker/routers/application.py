@@ -4,7 +4,7 @@ from tracker.database import get_db, ApplicationTable
 from tracker.routers.utils import get_token, verify_user_id, verify_application_owner
 from tracker.auth.utils import verify_and_refresh_jwt
 from jose import JWTError
-from tracker.models.application import ApplicationIn, ApplicationResponse
+from tracker.models.application import ApplicationIn, ApplicationResponse, ApplicationToModify
 
 router = APIRouter()
 
@@ -76,6 +76,43 @@ async def delete_application(application_id: int,
 
     return {
         "message": "Application deleted successfully",
+        "new_token": decoded_token["new_token"],
+        "token_type": "bearer"
+    }
+
+@router.put("/{application_id}/", response_model=ApplicationResponse)
+async def update_application(application_id: int,
+                             application: ApplicationToModify,
+                             Authorization: str = Header(..., description="Bearer token for authentication"),
+                             db: AsyncSession = Depends(get_db)):
+    token = get_token(Authorization)
+
+    try:
+        decoded_token = verify_and_refresh_jwt(token)
+    except JWTError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail=str(e))
+    username = decoded_token["username"]
+
+    application_in_db = await db.get(ApplicationTable, application_id)
+    if not application_in_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="Application not found")
+    await verify_application_owner(db, application_in_db.user_id, username)
+
+    application_in_db.company_name = application.company_name
+    application_in_db.position_title = application.position_title
+    application_in_db.status = application.status
+    application_in_db.notes = application.notes
+    application_in_db.date_applied = application.date_applied
+    application_in_db.posting_url = application.posting_url
+    application_in_db.rejection_reason = application.rejection_reason
+    application_in_db.rejection_date = application.rejection_date
+    await db.commit()
+    await db.refresh(application_in_db)
+    return {
+        "application": application_in_db,
         "new_token": decoded_token["new_token"],
         "token_type": "bearer"
     }
