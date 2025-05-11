@@ -29,3 +29,15 @@ async def verify_user_id(db: AsyncSession, user_id: int, username: str):
                             detail="User ID does not match the token")
 
     return True
+
+async def verify_application_owner(db: AsyncSession, application_user_id: int, username: str):
+    user = await get_user_from_db(db, username)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="User not found")
+    
+    if application_user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+                            detail="User ID does not match the token")
+
+    return True
