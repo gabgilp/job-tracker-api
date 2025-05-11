@@ -114,3 +114,31 @@ async def update_application(application_id: int,
         "new_token": decoded_token["new_token"],
         "token_type": "bearer"
     }
+
+@router.get("/{application_id}/", response_model=ApplicationResponse)
+async def get_application(application_id: int,
+                           Authorization: str = Header(..., description="Bearer token for authentication"),
+                           db: AsyncSession = Depends(get_db)):
+    token = get_token(Authorization)
+
+    try:
+        decoded_token = verify_and_refresh_jwt(token)
+    except JWTError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail=str(e))
+
+    username = decoded_token["username"]
+
+    application = await db.get(ApplicationTable, application_id)
+    if not application:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="Application not found")
+
+    await verify_application_owner(db, application.user_id, username)
+
+    return {
+        "application": application,
+        "new_token": decoded_token["new_token"],
+        "token_type": "bearer"
+    }

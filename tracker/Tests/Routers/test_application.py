@@ -145,8 +145,32 @@ async def test_update_application(async_client: AsyncClient):
 @pytest.mark.anyio
 @pytest.mark.order(7)
 async def test_get_application(async_client: AsyncClient):
-    #TODO: Implement this test
-    pass
+    global token
+    global application_id
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }   
+    response = await async_client.get(
+        f"/api/application/{application_id}/",
+        headers=headers
+    )
+    response = response.json()
+    expected_application = {
+        "user_id": user_id,
+        "company_name": "Updated Company",
+        "position_title": "Updated Position",
+        "status": "Interviewed",
+        "notes": "Updated notes",
+        "date_applied": datetime(2023, 10, 2).isoformat(),
+        "posting_url": "http://example.com/updated_job",
+        "rejection_reason": None,
+        "rejection_date": None,
+        "id": application_id
+    }
+    assert response["application"] == expected_application
+    assert response["application"]["id"] == application_id
+    assert response["new_token"] is not None
+    assert response["token_type"] == "bearer"
 
 @pytest.mark.anyio
 @pytest.mark.order(8)
