@@ -46,8 +46,6 @@ async def create_application(application: ApplicationIn,
         "new_token": decoded_token["new_token"],
         "token_type": "bearer"
     }
-
-
     
 @router.delete("/{application_id}/")
 async def delete_application(application_id: int,
