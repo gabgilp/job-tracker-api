@@ -23,3 +23,8 @@ class ApplicationResponse(BaseModel):
     new_token: str
     token_type: str
     application: Application
+
+class AllApplicationsResponse(BaseModel):
+    new_token: str
+    token_type: str
+    applications: list[Application]

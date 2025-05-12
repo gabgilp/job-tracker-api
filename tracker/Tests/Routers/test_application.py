@@ -175,8 +175,31 @@ async def test_get_application(async_client: AsyncClient):
 @pytest.mark.anyio
 @pytest.mark.order(8)
 async def test_get_all_applications(async_client: AsyncClient):
-    #TODO: Implement this test
-    pass
+    global token
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    response = await async_client.get(
+        "/api/application/all/",
+        headers=headers
+    )
+    response = response.json()
+    assert isinstance(response["applications"], list)
+    assert len(response["applications"]) > 0
+    assert all("id" in app for app in response["applications"])
+    assert all("company_name" in app for app in response["applications"])
+    assert all("position_title" in app for app in response["applications"])
+    assert all("status" in app for app in response["applications"])
+    assert all("notes" in app for app in response["applications"])
+    assert all("date_applied" in app for app in response["applications"])
+    assert all("posting_url" in app for app in response["applications"])
+    assert all("rejection_reason" in app for app in response["applications"])
+    assert all("rejection_date" in app for app in response["applications"])
+    assert all("user_id" in app for app in response["applications"])
+    assert all("id" in app for app in response["applications"])
+    assert response["new_token"] is not None
+    assert response["token_type"] == "bearer"
+    
 
 @pytest.mark.anyio
 @pytest.mark.order(9)

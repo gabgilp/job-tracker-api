@@ -4,7 +4,7 @@ import os
 from typing import AsyncGenerator, Generator
 import subprocess
 from httpx import ASGITransport, AsyncClient
-from tracker.database import engine, Base
+
 from sqlalchemy.sql import text
 
 # Set the environment state to "test"
@@ -13,6 +13,7 @@ os.environ["ENV_STATE"] = "test"
 # Start PostgreSQL before the test session
 subprocess.run(["bash", "start_postgresql.sh"], check=True)
 
+from tracker.database import engine, Base # noqa: E402
 from tracker.main import app  # noqa: E402
 import tracker.database as db  # noqa: E402
 

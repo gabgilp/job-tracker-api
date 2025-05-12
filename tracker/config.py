@@ -26,4 +26,4 @@ def get_config(env_state: str) -> Config:
         raise ValueError(f"Invalid environment state: {env_state}")
     return configs[env_state]()
 
-config = get_config(os.getenv("ENV_STATE", "dev"))
+config = get_config(os.getenv("ENV_STATE"))
