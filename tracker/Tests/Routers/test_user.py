@@ -22,8 +22,6 @@ async def test_get_user_data(async_client: AsyncClient):
     
     response = response.json()
 
-    print(response)
-
     expected_user = {
         "username": "testuser",
         "first_name": "Test",
@@ -39,8 +37,32 @@ async def test_get_user_data(async_client: AsyncClient):
 @pytest.mark.anyio
 @pytest.mark.order(10)
 async def test_update_user(async_client: AsyncClient):
-    #TODO: Implement the test for updating user data
-    pass
+    global token
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    updated_user = {
+        "first_name": "Updated",
+        "last_name": "User",
+        "username": "updateduser"
+    }
+    response = await async_client.put(
+        "/api/user/",
+        headers=headers,
+        json=updated_user
+    )
+    response = response.json()
+    
+    expected_user = {
+        "username": "updateduser",
+        "first_name": "Updated",
+        "last_name": "User",
+        "id": response["user"]["id"] 
+    }
+    assert response["user"] == expected_user
+    assert response["user"]["id"] is not None
+    assert response["new_token"] is not None
+    assert response["token_type"] == "bearer"
 
 @pytest.mark.anyio
 @pytest.mark.order(11)

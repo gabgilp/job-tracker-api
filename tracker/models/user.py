@@ -1,17 +1,15 @@
 from pydantic import BaseModel, ConfigDict
 
+class UserToModify(BaseModel):
+    first_name: str
+    last_name: str 
+    username: str 
 
-class UserIn(BaseModel):
-    username: str
+class UserIn(UserToModify):
     password: str
-    first_name: str
-    last_name: str
 
-class User(BaseModel):
+class User(UserToModify):
     id: int
-    username: str
-    first_name: str
-    last_name: str
 
 class UserResponse(BaseModel):
     new_token: str

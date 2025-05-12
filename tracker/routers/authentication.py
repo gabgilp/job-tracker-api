@@ -3,7 +3,7 @@ from tracker.auth.utils import get_password_hash, verify_password, generate_jwt_
 from tracker.models.user import UserIn, UserLogin, UserResponse
 from tracker.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
+from sqlalchemy import select
 from tracker.database import UserTable
 
 router = APIRouter()
@@ -12,10 +12,10 @@ router = APIRouter()
 async def register_user(user: UserIn, db: AsyncSession = Depends(get_db)):
     # Check if the username or email already exists
     existing_user = await db.execute(
-        text("SELECT * FROM users WHERE username = :username"),
-        {"username": user.username}
+        select(UserTable).where(UserTable.username == user.username)
     )
-    if existing_user.first():
+    existing_user = existing_user.scalar_one_or_none()
+    if existing_user:
         raise HTTPException(status_code=400, detail="Username already registered")
 
     # Hash the password
@@ -51,20 +51,16 @@ async def register_user(user: UserIn, db: AsyncSession = Depends(get_db)):
 @router.post("/login/", response_model=UserResponse)
 async def login_user(user: UserLogin, db: AsyncSession = Depends(get_db)):
     # Fetch the user from the database
-    result = await db.execute(
-        text("SELECT * FROM users WHERE username = :username"),
-        {"username": user.username}
+    db_user = await db.execute(
+        select(UserTable).where(UserTable.username == user.username)
     )
-    db_user = result.fetchone()  # Fetch the first row
+    db_user = db_user.scalar_one_or_none()  # Fetch the first row
 
     # Check if the user exists and verify the password
     if not db_user:
-        raise HTTPException(status_code=401, detail="Invalid username")
+        raise HTTPException(status_code=401, detail="Invalid username")  # Use _mapping to access row as a dictionary
 
-    # Convert the row to a dictionary
-    user_dict = dict(db_user._mapping)  # Use _mapping to access row as a dictionary
-
-    if not verify_password(user.password, user_dict["hashed_password"]):
+    if not verify_password(user.password, db_user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid password")
 
     # Generate the access token
@@ -74,9 +70,9 @@ async def login_user(user: UserLogin, db: AsyncSession = Depends(get_db)):
         "new_token": token["access_token"],
         "token_type": token["token_type"],
         "user": {
-            "id": user_dict["id"],
-            "username": user_dict["username"],
-            "first_name": user_dict["first_name"],
-            "last_name": user_dict["last_name"]
+            "id": db_user.id,
+            "username": db_user.username,
+            "first_name": db_user.first_name,
+            "last_name": db_user.last_name
         }
     }
