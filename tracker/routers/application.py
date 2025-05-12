@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Header
 from sqlalchemy.ext.asyncio import AsyncSession
-from tracker.database import get_db, ApplicationTable
-from tracker.routers.utils import get_token, verify_user_id, verify_application_owner, get_user_from_db
+from tracker.database import get_db, ApplicationTable, UserTable
+from tracker.routers.utils import get_token, verify_application_owner
 from tracker.auth.utils import verify_and_refresh_jwt
 from jose import JWTError
-from sqlalchemy import text
+from sqlalchemy import select
 from tracker.models.application import ApplicationIn, ApplicationResponse, ApplicationToModify, AllApplicationsResponse
 
 router = APIRouter()
@@ -24,7 +24,7 @@ async def create_application(application: ApplicationIn,
 
     username = decoded_token["username"]
 
-    await verify_user_id(db, application.user_id, username)
+    await verify_application_owner(db, application.user_id, username)
 
     new_application = ApplicationTable(
         user_id=application.user_id,
@@ -129,15 +129,19 @@ async def get_all_applications(Authorization: str = Header(..., description="Bea
             detail=str(e))
 
     username = decoded_token["username"]
-    user = await get_user_from_db(db, username)
+    user = await db.execute(
+        select(UserTable).where(UserTable.username == username)
+    )
+    user = user.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail="User not found")
 
     applications = await db.execute(
-        text("SELECT * FROM applications WHERE user_id = :user_id"),
-        {"user_id": user.id}
+        select(ApplicationTable).where(ApplicationTable.user_id == user.id)
     )
+
+    applications = applications.scalars().all()
 
     return {
         "applications": applications,
