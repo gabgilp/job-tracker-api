@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Header
-from tracker.auth.utils import verify_and_refresh_jwt
-from tracker.database import get_db, UserTable
+from tracker.auth.utils import verify_and_refresh_jwt, generate_jwt_for_user
+from tracker.database import get_db, UserTable, ApplicationTable
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import JWTError
 from tracker.models.user import UserResponse, UserToModify
@@ -73,6 +73,8 @@ async def update_user_data(updated_user: UserToModify,
         if existing_user:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
                                 detail="Username already taken")
+        new_token = generate_jwt_for_user(updated_user.username)["access_token"]
+        decoded_token["new_token"] = new_token
     
     user.username = updated_user.username
     user.first_name = updated_user.first_name
@@ -92,3 +94,42 @@ async def update_user_data(updated_user: UserToModify,
         "token_type": "bearer"
     }
     
+
+@router.delete("/")
+async def delete_user(Authorization: str = Header(..., description="Bearer token for authentication"), 
+                       db: AsyncSession = Depends(get_db)):
+    token = get_token(Authorization)
+
+    try:
+        decoded_token = verify_and_refresh_jwt(token)
+    except JWTError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail=str(e))
+    
+    username = decoded_token["username"]
+
+    user = await db.execute(
+        select(UserTable).where(UserTable.username == username)
+    )
+    user = user.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="User not found")
+    
+    try:
+        applications = await db.execute(
+            select(ApplicationTable).where(ApplicationTable.user_id == user.id)
+        )
+        applications = applications.scalars().all()
+        for application in applications:
+            await db.delete(application)
+        await db.delete(user)
+        await db.commit()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f"Error deleting user and associated applications: {str(e)}")
+
+    return {
+        "message": "User deleted successfully"
+    }
